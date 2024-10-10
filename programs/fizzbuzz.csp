@@ -1,0 +1,19 @@
+i <- 1
+
+REPEAT 100 TIMES {
+    IF (i MOD 15 = 0) {
+        DISPLAY("Fizzbuzz")
+    } ELSE {
+        IF (i MOD 5 = 0) {
+            DISPLAY("Buzz")
+        } ELSE {
+            IF (i MOD 3 = 0) {
+                DISPLAY("Fizz")
+            } ELSE {
+                DISPLAY(i)
+            }
+        }
+    }
+
+    i <- i + 1
+}        

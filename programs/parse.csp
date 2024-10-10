@@ -1,0 +1,51 @@
+/*
+    The built in function parse function is not seen in the CSP grammar in any way.
+    It has never been in an Ap Classroom nor the offical spec.
+    To prove that it is fully possible to implement such a function in CSP,
+    this is a fully functioning implementation of the parse function.
+*/
+PROCEDURE cParse(string) {
+    neg <- false
+    ret <- 0
+
+    IF (SUBSTRING(string, 1, 1) = "-") {
+        neg <- true
+        string = SUBSTRING(string, 2, len(string) - 1)
+    }
+
+    i <- 1
+    REPEAT len(string) TIMES {
+        c <- SUBSTRING(string, i, 1)
+        ret <- ret * 10
+
+        // Amazing!
+        IF (c = "1") { ret <- ret + 1 }
+        IF (c = "2") { ret <- ret + 2 }
+        IF (c = "3") { ret <- ret + 3 }
+        IF (c = "4") { ret <- ret + 4 }                  
+        IF (c = "5") { ret <- ret + 5 }
+        IF (c = "6") { ret <- ret + 6 }
+        IF (c = "7") { ret <- ret + 7 }
+        IF (c = "8") { ret <- ret + 8 }
+        IF (c = "9") { ret <- ret + 9 }
+
+        i <- i + 1
+    }
+
+    IF (neg) { 
+        ret <- ret * -1 
+    }
+
+    RETURN(ret)
+}
+
+DISPLAY("Integer: ")
+inp <- INPUT()
+DISPLAY("Parsed as: ")
+
+val <- cParse(inp)
+DISPLAY(val)
+
+// Prove we can actually do math and this isn't a string
+DISPLAY("Squared: ")
+DISPLAY(val * val)

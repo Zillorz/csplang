@@ -1,0 +1,114 @@
+PROCEDURE cidxof(string, needles) {
+    i <- len(string)
+    n <- 0
+
+    REPEAT len(string) TIMES {
+        c <- SUBSTRING(string, i, 1)
+
+        IF (c = "(") {
+            n <- n + 1
+        } 
+        IF (c = ")") {
+            n <- n - 1
+        }
+
+        IF(n = 0) {
+            FOR EACH needle IN needles {
+                IF (c = needle) {
+                    RETURN([needle, i])
+                }
+            }
+        }
+
+        i <- i - 1
+    }
+
+    RETURN(-1)
+}
+
+PROCEDURE exp(base, power) {
+    IF (base = 0) { RETURN(0) }
+    IF (power = 0) { RETURN(1) }
+
+    IF (power MOD 2 = 0) {
+        RETURN(exp(base, power / 2) * exp(base, power / 2))
+    } ELSE {
+        RETURN(exp(base, power / 2) * exp(base, power / 2) * base)
+    }
+}
+
+PROCEDURE remove_outer(string) {
+    // remove spaces
+    REPEAT UNTIL (SUBSTRING(string, 1, 1) != " ") { string <- SUBSTRING(string, 2, len(string) - 1) }
+    REPEAT UNTIL (SUBSTRING(string, len(string), 1) != " ") { string <- SUBSTRING(string, 1, len(string) - 1) } 
+
+    IF (SUBSTRING(string, 1, 1) = "(" AND SUBSTRING(string, len(string), 1) = ")") {
+        i <- 2
+        n <- 1
+        REPEAT len(string) - 2 TIMES {
+            IF (SUBSTRING(string, i, 1) = "(") { 
+                n <- n + 1
+            } 
+            IF (SUBSTRING(string, i, 1) = ")") {
+                n <- n - 1
+            }
+
+            IF (n = 0) { RETURN(string) }
+
+            i <- i + 1
+        }
+
+        // at this point there are parenthesis on outside (matching)
+        RETURN(remove_outer(SUBSTRING(string, 2, len(string) - 2)))
+    }
+
+    RETURN(string)
+}
+
+PROCEDURE calc(string) {
+    IF(LEN(string) = 0) { RETURN(0) }
+
+    string <- remove_outer(string)
+    
+    pos <- cidxof(string, ["+", "-"])
+    IF (pos != -1) {
+        a <- calc(SUBSTRING(string, 1, pos[2] - 1))
+        b <- calc(SUBSTRING(string, pos[2] + 1, len(string) - pos[2]))
+
+        IF(pos[1] = "+") {
+            RETURN(a + b)
+        }
+        IF(pos[1] = "-") {
+            RETURN(a - b)
+        }
+    }
+
+    pos <- cidxof(string, ["*", "/", "%"])
+    IF (pos != -1) {
+        a <- calc(SUBSTRING(string, 1, pos[2] - 1))
+        b <- calc(SUBSTRING(string, pos[2] + 1, len(string) - pos[2]))
+
+        IF(pos[1] = "*") {
+            RETURN(a * b)
+        }
+        IF(pos[1] = "/") {
+            RETURN(a / b)
+        }
+        IF(pos[1] = "%") {
+            RETURN(a MOD b)
+        }
+    } 
+
+    pos <- cidxof(string, ["^"])
+    IF (pos != -1) {
+        a <- calc(SUBSTRING(string, 1, pos[2] - 1))
+        b <- calc(SUBSTRING(string, pos[2] + 1, len(string) - pos[2]))
+        
+        RETURN(exp(a, b))
+    }
+
+    RETURN(PARSE(string))
+}
+
+DISPLAY("Enter Equation: ")
+DISPLAY(calc(INPUT()))

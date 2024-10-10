@@ -1,0 +1,27 @@
+// Built In functions
+DISPLAY("Built in functions section")
+
+// a <- INPUT(), stores the next line of input into 'a'
+
+list <- [1, 2, 3, 4]
+INSERT(list, 2, 7);
+assert_eq(list, [1, 7, 2, 3, 4])
+
+REMOVE(list, 3)
+assert_eq(list, [1, 7, 3, 4])
+
+assert_eq(LEN(list), 4)
+assert_eq(LEN("This is a string"), 16)
+
+text <- "This is a good day"
+assert_eq(SUBSTRING(text, 11, 4), "good")
+
+text <- CONCAT(text, ", tommorow will be better!")
+assert_eq(text, "This is a good day, tommorow will be better!");
+
+assert_eq(REVERSE("Happy"), "yppaH")
+assert_eq(REVERSE("tacocat"), "tacocat")
+
+// Throws error if two values are not equal
+// Go to wacky.csp for explanation of this function
+PROCEDURE assert_eq(l,r){IF(l!=r){DISPLAY("LEFT != RIGHT");DISPLAY("LEFT: ", l);DISPLAY("RIGHT: ", r);PANIC()}}

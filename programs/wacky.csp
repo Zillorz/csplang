@@ -1,0 +1,115 @@
+// A simple program showing off the interpreter.
+// Some features, like vargs and TYPEID are not in the
+
+// CSP spec or any of the released material.
+// Other features are speculative, eg. Nth dimensional arrays
+
+PROCEDURE assert_eq(left, right) {
+    IF (left != right) {
+        DISPLAY("LEFT != RIGHT")
+        DISPLAY(CONCAT("Left: ", left))
+        DISPLAY(CONCAT("Right: ", right))
+
+        // throws error
+        PANIC()
+    }
+}
+
+
+// Turns nested structure(s) into 1D array
+PROCEDURE flatten(vargs) {
+    // Nested functions!
+    PROCEDURE flatten_helper(list) {
+        ret <- []
+
+        FOR EACH item IN list {
+            IF (TYPEID(item) = 4) {
+                flattened <- flatten_helper(item)
+                FOR EACH flat IN flattened {
+                    APPEND(ret, flat)
+                }
+            } ELSE {
+              APPEND(ret, item)
+            }
+        }
+
+        RETURN(ret)
+    }
+
+    RETURN(flatten_helper(vargs))
+}
+
+// functions are case-insensitive
+assert_eq(FlAtTen([2, 3, [4, 3, [[3]], "Ora", false, [[[[6]]]]]]), [2, 3, 4, 3, 3, "Ora", false, 6])
+ASSERT_eq(flatten(2, 3, 4, 5, ["a", "b", ["c"]]), [2, 3, 4, 5, "a", "b", "c"])
+assert_eq(flatten(1, 2, 3, 4, 5), [1, 2, 3, 4, 5])
+DISPLAY("Flatten works!")
+
+// n dimensional arrays!
+PROCEDURE create_nd_array(dimensions, size) {
+    outer <- []
+
+    REPEAT size TIMES {
+        APPEND(outer, 1)
+    }
+
+    REPEAT dimensions - 1 TIMES {
+        new <- []
+
+        REPEAT size TIMES {
+            APPEND(new, outer)
+        }
+
+        outer <- new
+    }
+
+    RETURN(outer)
+}
+
+assert_eq(create_nd_array(2, 4), [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]])
+assert_eq(create_nd_array(3, 2), [[[1, 1], [1, 1]], [[1, 1], [1, 1]]])
+DISPLAY("ND arrays work!")
+
+// Emoji identifiers
+PROCEDURE 🎉(🍰, 🕯️) {
+    DISPLAY("THIS IS A PARTY  🎉🎉🎉🎉🎉")
+    DISPLAY(CONCAT("HERES THE CAKE: ", 🍰))
+    DISPLAY(CONCAT("BLOW OUT THE CANDLES: ", 🕯️))
+}
+
+// semicolons count as line-breaks
+q <- 2; z <- 3
+🎉("Very yummy cake", "spooky candles"); q <- z * q; z <- 20;
+assert_eq(q, 6); assert_eq(z, 20)
+DISPLAY("Semi colons and emoji identifiers work!")
+
+// type ids
+assert_eq(TYPEID("string"), 1)
+assert_eq(TYPEID(123), 2)
+assert_eq(TYPEID(true), 3)
+assert_eq(TYPEID(["list", 1, false]), 4)
+
+// create a undefined value
+assert_eq(TYPEID(CREATE_UNDEFINED()), 0)
+
+// catch error returns true if error is returned, otherwise returns false
+// only works on functions with no arguments
+assert_eq(CATCH_ERROR(PANIC), true)
+
+v <- 20
+PROCEDURE access() {
+    DISPLAY(v)
+}
+
+// cannot access variable outside of current scope
+assert_eq(CATCH_ERROR(access), true)
+
+DISPLAY("Finally the last function");
+
+// Yup, return is coded as a built-in function
+// because of the syntax of return, I decided it
+// was easier to do this way
+// No, functions can not be overwritten.
+RETURN(0);
+DISPLAY("You will never see this text!");
+

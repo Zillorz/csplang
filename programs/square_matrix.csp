@@ -1,0 +1,102 @@
+// vargs is not implemented in the csp spec
+// this feature can be done with a thousand concats (I'm too lazy)
+// or passing in a list as an argument (less ergonomic)
+// or multiple display params (added after this was written)
+PROCEDURE format(vargs) {
+    string <- vargs[1]
+
+    argp <- 2
+    ret <- ""
+
+    i <- 1
+    REPEAT len(string) TIMES {
+        c <- SUBSTRING(string, i, 1)
+
+        IF (c = "*") {
+            ret <- CONCAT(ret, vargs[argp])
+            argp <- argp + 1
+        } ELSE {
+            ret <- CONCAT(ret, c)
+        }
+
+        i <- i + 1
+    }
+
+    RETURN(ret)
+}
+
+PROCEDURE parse_ints() {
+    inps <- INPUT()
+    
+    ret <- []
+    temp <- ""
+
+    i <- 1
+    REPEAT len(inps) TIMES {
+        c <- SUBSTRING(inps, i, 1)
+        IF (c != " ") {
+            temp <- CONCAT(temp, c)
+        } ELSE {
+            IF (len(temp) > 0) {
+                APPEND(ret, PARSE(temp))
+                temp <- ""
+            }
+        }
+        i <- i + 1
+    }
+
+    IF (len(temp) > 0) {
+        APPEND(ret, PARSE(temp))
+    }
+
+    RETURN(ret)    
+}
+
+PROCEDURE input_matrix(name, size) {
+    DISPLAY(format("Matrix *:", name))
+    matrix <- []
+
+    i <- 1
+    REPEAT size TIMES {
+        DISPLAY(format("Row *:", i))
+        row <- parse_ints()
+        APPEND(matrix, row)
+        i <- i + 1
+    }
+
+    RETURN(matrix)
+}
+
+DISPLAY("Dimensions: ")
+n <- PARSE(INPUT())
+
+A <- input_matrix("A", n)
+B <- input_matrix("B", n)
+
+// So efficient 🤗
+C <- []
+i <- 1
+REPEAT n TIMES {
+    row <- []
+    
+    j <- 1
+    REPEAT n TIMES {
+        val <- 0
+        k <- 1
+        REPEAT n TIMES {
+            val <- val + A[i][k] * B[k][j]
+            k <- k + 1
+        }
+        
+        APPEND(row, val)
+        j <- j + 1
+    }
+
+    APPEND(c, row)
+    i <- i + 1
+}
+
+// pretty print
+FOR EACH row IN c {
+    DISPLAY(row)
+}
